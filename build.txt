@@ -1,0 +1,3 @@
+displayName = Terraria Ambience (+Multiplayer)
+author = FulkorRain
+version = 0.1
