@@ -8,32 +8,30 @@ namespace TerrariaAmbience
     public class AmbiencePlayer : ModPlayer
     {
         private string lastBiome = "";
-        private SlotId currentSoundSlot; // Keep track of currently playing sound
+        private SlotId currentSoundSlot;
+        private ActiveSound activeSound; // Reference to the playing sound
         private bool soundPlaying = false;
 
-        // Predefined sounds
+        // Predefined looped sounds
         private static readonly SoundStyle JungleSound = new SoundStyle("TerrariaAmbience/Sounds/Custom/JungleRany")
         {
             IsLooped = true,
-            Volume = 1f
+            Volume = 0.7f
         };
-
         private static readonly SoundStyle SnowSound = new SoundStyle("TerrariaAmbience/Sounds/Custom/SnowRany")
         {
             IsLooped = true,
             Volume = 0.7f
         };
-
         private static readonly SoundStyle DesertSound = new SoundStyle("TerrariaAmbience/Sounds/Custom/DesertRany")
         {
             IsLooped = true,
             Volume = 0.7f
         };
-
         private static readonly SoundStyle ForestSound = new SoundStyle("TerrariaAmbience/Sounds/Custom/ForestRany")
         {
             IsLooped = true,
-            Volume = 1.5f
+            Volume = 0.7f
         };
 
         public override void PostUpdateMiscEffects()
@@ -54,14 +52,12 @@ namespace TerrariaAmbience
                 Main.NewText("You are now in: " + currentBiome, 200, 200, 255);
 
                 // Stop previous sound if one is playing
-                if (soundPlaying)
+                if (soundPlaying && activeSound != null && activeSound.IsPlaying)
                 {
-                    SoundEngine.TryGetActiveSound(currentSoundSlot, out var activeSound);
-                    activeSound?.Stop();
-                    soundPlaying = false;
+                    activeSound.Stop();
                 }
 
-                // Play new biome sound and keep its slot
+                // Play new biome sound and keep reference
                 switch (currentBiome)
                 {
                     case "Jungle":
@@ -78,8 +74,19 @@ namespace TerrariaAmbience
                         break;
                 }
 
+                if (SoundEngine.TryGetActiveSound(currentSoundSlot, out var sound))
+                {
+                    activeSound = sound;
+                }
+
                 soundPlaying = true;
                 lastBiome = currentBiome;
+            }
+
+            // Make sure the sound follows the player
+            if (soundPlaying && activeSound != null && activeSound.IsPlaying)
+            {
+                activeSound.Position = Player.Center;
             }
         }
     }
