@@ -10,7 +10,7 @@
 
 	<!-- References -->
 	<ItemGroup>
-		
+	  <Folder Include="Sounds\Custom\" />
 	</ItemGroup>
 
 </Project>
